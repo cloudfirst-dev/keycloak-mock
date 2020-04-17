@@ -113,15 +113,24 @@ subprojects {
                     }
                 }
             }
-            repositories.maven {
-                if (project.version.endsWith('-SNAPSHOT')) {
-                    credentials.username project.findProperty('sonatypeUsername')
-                    credentials.password project.findProperty('sonatypePassword')
-                    url 'https://oss.sonatype.org/content/repositories/snapshots/'
-                } else {
-                    credentials.username project.findProperty('sonatypeUsername')
-                    credentials.password project.findProperty('sonatypePassword')
-                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            repositories {
+                maven {
+                    name 'ossrh'
+                    if (project.version.endsWith('-SNAPSHOT')) {
+                        credentials.username project.findProperty('sonatypeUsername')
+                        credentials.password project.findProperty('sonatypePassword')
+                        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+                    } else {
+                        credentials.username project.findProperty('sonatypeUsername')
+                        credentials.password project.findProperty('sonatypePassword')
+                        url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+                    }
+                }
+                maven {
+                    name 'github'
+                    credentials.username = project.findProperty("githubUsername") ?: System.getenv("USERNAME")
+                    credentials.password = project.findProperty("githubToken") ?: System.getenv("TOKEN")
+                    url 'https://maven.pkg.github.com/tng/keycloak-mock'
                 }
             }
         }

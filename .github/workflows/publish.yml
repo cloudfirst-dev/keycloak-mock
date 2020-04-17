@@ -1,0 +1,35 @@
+name: GitHub Packages Publish
+
+on:
+  push:
+    branches:
+      - master
+      # do not merge!
+      - packages
+  release:
+    types:
+      - created
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Java for publishing
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        server-id: github
+        settings-path: ${{ github.workspace }}
+
+    # ensure we only publish green builds
+    - name: Build
+      run: ./gradlew build
+
+    - name: Publish to GitHub Packages
+      run: ./gradlew -d publishAllPublicationsToGithubRepository
+      env:
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
